@@ -112,12 +112,6 @@ export default {
 ## **5. Déploiement & Hébergement**
 ### **5.1 Docker & Proxy NGINX**
 L'API et le frontend seront déployés via **Docker** et un proxy **NGINX** assurera la gestion des requêtes.
-
----
-
-## **6. Conclusion**
-Ce document définit une **plateforme de paris esports robuste et évolutive**. L'architecture repose sur des **technologies modernes** pour offrir une **expérience utilisateur fluide** et une **gestion sécurisée des données**. 
-
 Le projet est conçu pour être **scalable**, sécurisé et facilement administrable, tout en offrant une expérience immersive aux fans de LoL Esports.
 
 ---
@@ -126,8 +120,4 @@ Le projet est conçu pour être **scalable**, sécurisé et facilement administr
 - **Documentation Riot API** : [developer.riotgames.com](https://developer.riotgames.com)
 - **Guide NGINX et Docker** : [nginx.com](https://www.nginx.com/resources/)
 - **MongoDB Atlas pour l'hébergement de bases de données** : [mongodb.com](https://www.mongodb.com/cloud/atlas)
-
----
-
-Avec ces ajouts, la documentation est plus détaillée et occupe maintenant environ 6-7 pages.
 
