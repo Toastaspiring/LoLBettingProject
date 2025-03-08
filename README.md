@@ -14,7 +14,7 @@ La plateforme de paris sur LoL Esports est un projet visant à offrir aux utilis
 ### **1.3 Public Cible**
 - Les amateurs de compétitions **LoL Esports** souhaitant suivre les matchs et parier de manière ludique.
 - Les joueurs intéressés par **une expérience compétitive** avec classements et badges.
-- Les développeurs cherchant un projet open-source bien structuré en **Node.js et Vue.js/React**.
+- Les friant de paris mais **pauvre**.
 
 ---
 
