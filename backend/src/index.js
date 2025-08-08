@@ -1,5 +1,6 @@
 const express = require('express');
 const pandascoreService = require('./pandascore.service.js');
+const betsService = require('./bets.service.js');
 
 const app = express();
 const port = 3000;
@@ -34,6 +35,34 @@ app.get('/matches/:id', async (req, res) => {
         res.status(500).json({ message: 'An error occurred while fetching match details.' });
     }
 });
+
+// --- Betting Endpoints ---
+
+// Place a new bet
+app.post('/bets', async (req, res) => {
+    try {
+        const { userId, matchId, teamId, amount } = req.body;
+        if (!userId || !matchId || !teamId || !amount) {
+            return res.status(400).json({ message: 'Missing required fields for bet.' });
+        }
+        const newBet = await betsService.createBet({ userId, matchId, teamId, amount });
+        res.status(201).json(newBet);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// Get all bets for a specific user
+app.get('/users/:userId/bets', async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const userBets = await betsService.getBetsForUser(userId);
+        res.json(userBets);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 
 const server = app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
