@@ -1,17 +1,32 @@
 const express = require('express');
 const pandascoreService = require('./pandascore.service.js');
 const betsService = require('./bets.service.js');
+const authRouter = require('./auth.router.js');
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 const port = 3000;
 
 // Middleware to parse JSON bodies
 app.use(express.json());
+app.use(cookieParser());
+
+// Session middleware
+app.use(session({
+    secret: 'a-very-secret-key-that-should-be-in-env-vars', // In production, use an env variable
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false } // In production, set to true if using HTTPS
+}));
 
 // Root endpoint
 app.get('/', (req, res) => {
   res.send('Welcome to the LoL Esports Betting Platform API!');
 });
+
+// --- Auth Routes ---
+app.use('/auth', authRouter);
 
 // An endpoint to get upcoming matches
 app.get('/matches/upcoming', async (req, res) => {

@@ -26,6 +26,38 @@ const updateUserBalance = (userId, amountChange, dbConnection = db) => {
     });
 };
 
+const findUserByRiotId = (riotId) => {
+    return new Promise((resolve, reject) => {
+        const sql = `SELECT * FROM users WHERE riot_id = ?`;
+        db.get(sql, [riotId], (err, row) => {
+            if (err) {
+                return reject(err);
+            }
+            resolve(row);
+        });
+    });
+};
+
+const createUser = (riotId, username) => {
+    return new Promise((resolve, reject) => {
+        const sql = `INSERT INTO users (riot_id, username) VALUES (?, ?)`;
+        db.run(sql, [riotId, username], function(err) {
+            if (err) {
+                return reject(err);
+            }
+            // After creating, fetch the new user to return the full object
+            db.get(`SELECT * FROM users WHERE id = ?`, [this.lastID], (err, row) => {
+                if (err) {
+                    return reject(err);
+                }
+                resolve(row);
+            });
+        });
+    });
+};
+
 module.exports = {
     updateUserBalance,
+    findUserByRiotId,
+    createUser,
 };

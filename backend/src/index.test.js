@@ -1,9 +1,11 @@
 const request = require('supertest');
 const { app, server } = require('./index.js');
 const betsService = require('./bets.service.js');
+const authService = require('./auth.service.js');
 
-// Mock the bets.service.js module
+// Mock services
 jest.mock('./bets.service.js');
+jest.mock('./auth.service.js');
 
 // This is a Jest hook that runs after all tests in this file have completed.
 // We use it to close the server, which prevents Jest from hanging.
@@ -105,6 +107,50 @@ describe('API Endpoints', () => {
                 expect(res.body).toEqual(userBets);
                 expect(betsService.getBetsForUser).toHaveBeenCalledWith(String(userId));
             });
+        });
+    });
+
+    describe('Auth Endpoints', () => {
+        const agent = request.agent(app); // Use an agent to persist cookies
+
+        it('GET /auth/me should return 401 when not logged in', async () => {
+            const res = await agent.get('/auth/me');
+            expect(res.statusCode).toEqual(401);
+        });
+
+        it('GET /auth/riot should redirect to the callback', async () => {
+            const res = await agent.get('/auth/riot');
+            expect(res.statusCode).toEqual(302); // 302 is the status code for redirect
+            expect(res.headers.location).toContain('/auth/riot/callback');
+        });
+
+        it('should log in a user, set a session, and allow access to /me', async () => {
+            const mockUser = { id: 1, username: 'MockUser', riot_id: 'mock-riot-id-123' };
+            authService.findOrCreateUser.mockResolvedValue(mockUser);
+
+            // 1. Hit the login route, which will redirect and log us in
+            const loginRes = await agent.get('/auth/riot');
+
+            // The agent will follow the redirect and store the cookie automatically.
+            expect(loginRes.statusCode).toEqual(200);
+            expect(loginRes.body.message).toBe('Login successful!');
+
+            // 2. Now that we are "logged in", we should be able to access /auth/me
+            const meRes = await agent.get('/auth/me');
+            expect(meRes.statusCode).toEqual(200);
+            expect(meRes.body).toEqual({
+                id: mockUser.id,
+                username: mockUser.username,
+                riotId: mockUser.riot_id,
+            });
+
+            // 3. Log out
+            const logoutRes = await agent.post('/auth/logout');
+            expect(logoutRes.statusCode).toEqual(200);
+
+            // 4. Verify we are logged out
+            const finalMeRes = await agent.get('/auth/me');
+            expect(finalMeRes.statusCode).toEqual(401);
         });
     });
 });
