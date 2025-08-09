@@ -56,8 +56,42 @@ const createUser = (riotId, username) => {
     });
 };
 
+const deleteUser = (userId) => {
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+            db.run('BEGIN TRANSACTION;', (err) => {
+                if (err) return reject(err);
+
+                // Step 1: Delete all bets associated with the user
+                db.run(`DELETE FROM bets WHERE user_id = ?`, [userId], function(err) {
+                    if (err) {
+                        db.run('ROLLBACK;');
+                        return reject(err);
+                    }
+
+                    // Step 2: Delete the user
+                    db.run(`DELETE FROM users WHERE id = ?`, [userId], function(err) {
+                        if (err) {
+                            db.run('ROLLBACK;');
+                            return reject(err);
+                        }
+
+                        if (this.changes === 0) {
+                            db.run('ROLLBACK;');
+                            return reject(new Error('User not found.'));
+                        }
+
+                        db.run('COMMIT;', (err) => err ? reject(err) : resolve());
+                    });
+                });
+            });
+        });
+    });
+};
+
 module.exports = {
     updateUserBalance,
     findUserByRiotId,
     createUser,
+    deleteUser,
 };

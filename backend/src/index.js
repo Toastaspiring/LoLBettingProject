@@ -2,8 +2,10 @@ const express = require('express');
 const pandascoreService = require('./pandascore.service.js');
 const betsService = require('./bets.service.js');
 const authRouter = require('./auth.router.js');
+const usersRouter = require('./users.router.js');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
+const helmet = require('helmet');
 
 const app = express();
 const port = 3000;
@@ -11,6 +13,7 @@ const port = 3000;
 // Middleware to parse JSON bodies
 app.use(express.json());
 app.use(cookieParser());
+app.use(helmet());
 
 // Session middleware
 app.use(session({
@@ -27,6 +30,7 @@ app.get('/', (req, res) => {
 
 // --- Auth Routes ---
 app.use('/auth', authRouter);
+app.use('/users', usersRouter);
 
 // An endpoint to get upcoming matches
 app.get('/matches/upcoming', async (req, res) => {
